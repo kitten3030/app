@@ -28,40 +28,22 @@ self.addEventListener('install', event => {
 
 // 前端監聽後端發送推播通知則觸發
 self.addEventListener('push', (event) => {
-  console.log('收到推播訊息222', event);
-  // const data = event.data?.json() ?? {};
-  // console.log('1111', data.message);
-  // let options = {
-  //   body: data.message,
-  //   icon: data.icon,
-  //   badge: data.icon,
-  //   // tag: '',
-  //   // renotify: true,
+  console.log('收到推播訊息', event);
+  let title = '收到的有效負載';
+  // const options = {
+  //   body: '感謝您發送此推播訊息',
+  //   icon: './images/logo-192x192.png',
+  //   badge: './images/badge-72x72.png',
+  //   // image:
+  //   //   'https://augt-forum-upload.s3-ap-southeast-1.amazonaws.com/original/1X/6b3cd55281b7bedea101dc36a6ef24034806390b.png',
   //   data: {
-  //     role: data.role,
-  //     source: data.source,
-  //     child_id: data.child_id,
+  //     url: 'https://web.dev/push-notifications-overview/',
+  //     link: 'https://web.dev/push-notifications-overview/',
   //   },
   // };
-  // event.waitUntil(
-  //   self.registration.showNotification(data.title, options)
-  // );
-  let title = 'Hello';
-  const options = {
-    body: '感謝您發送此推播訊息',
-    icon: './images/logo-192x192.png',
-    badge: './images/badge-72x72.png',
-    // image:
-    //   'https://augt-forum-upload.s3-ap-southeast-1.amazonaws.com/original/1X/6b3cd55281b7bedea101dc36a6ef24034806390b.png',
-    data: {
-      url: 'https://web.dev/push-notifications-overview/',
-      link: 'https://web.dev/push-notifications-overview/',
-    },
-  };
+  const options = event.data.json() ?? {};
+  const dataText = event.data.text() || 'deen';
   if (event.data) {
-    const dataText = event.data.text();
-    title = '收到的有效負載';
-    options.body = `推播數據: '${dataText}'`;
   }
   event.waitUntil(
     self.registration.showNotification(

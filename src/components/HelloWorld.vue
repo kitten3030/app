@@ -22,7 +22,6 @@
         <CurrentLoading :show="messageLoading" colorCode="#202b38" />
       </div>
       <div class="setupTitle">推播通知</div>
-      <div>33{{ isReturn }}</div>
       <div class="subscriptionBox">
         <div class="flexBox-v gap-8">
           <div class="button">
@@ -142,7 +141,6 @@ const deleteMessage = (payload) => {
 /* end */
 
 /* 推播通知 */
-const isReturn = ref('');
 const isNotification = ref(false);
 const subscriptionLoading = ref(true);
 const subscriptions = ref([]);
@@ -314,7 +312,6 @@ const pushNotification = async () => {
     //   })
     //   .finally(function () {
     //   });
-    isReturn.value = res;
     console.log(res);
   }
 };

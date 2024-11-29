@@ -54,18 +54,16 @@ app.post('/send-notification', (req, res) => {
       apiKeys.publicKey,
       apiKeys.privateKey
     );
-    webpush.sendNotification(req.body.token, 'hello');
-    // 推播的內容
-    const json = options;
+    // webpush.sendNotification(req.body.token, 'deen');
     // 傳送推播
-    // webpush
-    //   .sendNotification(pushSubscription, json)
-    //   .then(function () {
-    //     // callback(null);
-    //   })
-    //   .catch(function (err) {
-    //     // callback(err);
-    //   });
+    webpush
+      .sendNotification(pushSubscription, JSON.stringify(options))
+      .then(function () {
+        // callback(null);
+      })
+      .catch(function (err) {
+        // callback(err);
+      });
   } catch (e) {
     // callback(e);
   }
