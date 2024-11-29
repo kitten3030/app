@@ -22,6 +22,7 @@
         <CurrentLoading :show="messageLoading" colorCode="#202b38" />
       </div>
       <div class="setupTitle">推播通知</div>
+      <div>11{{ isReturn }}</div>
       <div class="subscriptionBox">
         <div class="flexBox-v gap-8">
           <div class="button">
@@ -48,6 +49,8 @@
 <script setup>
 import CurrentLoading from '@/components/util/CurrentLoading.vue';
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue';
+
+import axios from 'axios';
 
 /*
 server
@@ -139,6 +142,7 @@ const deleteMessage = (payload) => {
 /* end */
 
 /* 推播通知 */
+const isReturn = ref('');
 const isNotification = ref(false);
 const subscriptionLoading = ref(true);
 const subscriptions = ref([]);
@@ -158,8 +162,8 @@ const urlB64ToUint8Array = (base64String) => {
   return outputArray;
 };
 // 接收發送的身份
-const PublicKey = 'BKVBgjPdr94hu8oAjr8SLBA5BOg9yYjZ3kLVDpMQlapWir-CitP_Wom8XrzNz4b5JGi22VaQtLZAoq2IkuRs-Rk';
-const PrivateKey = 'Xy9w670JgcwroARQ8u56PuLGYoi9Y0qACVryY5teOew';
+const PublicKey = 'BD996BElw9viClG3BPRpykki-tIUTAzimPNBnllr7CHSgnQ0oytO0HDH3DAABC2w9cPmUrLpbim9FyFnNrtvhrA';
+const PrivateKey = 'caiJgyzEfsKjkfuqjqkbkFQMvT8aptAVZQnxFFat9Do';
 const ServerKey = urlB64ToUint8Array(PublicKey);
 // 註冊 sw.js
 const serviceWorker_register = async () => {
@@ -255,40 +259,12 @@ const initialiseState = async () => {
 // const webpush = require('web-push');
 // const webPush = webpush;
 // webPush.setVapidDetails('mailto:deen1130@gmail.com', PublicKey, PrivateKey);
-const sendPushMessage = (token, payload, callback) => {
-  try {
-    // GCM 相容
-    webpush.setGCMAPIKey(VAPID_PUBLIC_KEY);
-    // 填入之前儲存的 endpoint, p256dh 與 auth
-    const pushSubscription = {
-      endpoint: token.endpoint,
-      keys: {
-        p256dh: token.keys.p256dh,
-        auth: token.keys.auth,
-      },
-    };
-    // 設定 VAPID public/private key 以及 email
-    webpush.setVapidDetails('mailto:name@youremail.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
-    // 推播的內容
-    var json = payload;
-    // 傳送推播
-    webpush
-      .sendNotification(pushSubscription, json)
-      .then(function () {
-        callback(null);
-      })
-      .catch(function (err) {
-        callback(err);
-      });
-  } catch (e) {
-    callback(e);
-  }
-};
+
 /* end */
 
 const pushNotification = async () => {
   const options = {
-    body: '感謝您發送此推播訊息',
+    body: '已審核成功',
     icon: './images/logo-192x192.png',
     badge: './images/badge-72x72.png',
     // image:
@@ -310,19 +286,36 @@ const pushNotification = async () => {
     //     // 對你的通知執行某些操作
     //   });
     // });
+    // navigator.serviceWorker.getRegistration().then((reg) => {
+    //   reg.showNotification('Hello', options);
+    // });
+    // 發送 3 (服務端)
     const subscription = {
       ...subscriptions.value[0],
     };
-    console.log(subscription);
-    navigator.serviceWorker.getRegistration().then((reg) => {
-      reg.showNotification('Hello', options);
-    });
-    // 發送 3
-    // const subscription = {
-    //   ...subscriptions.value[0],
-    // };
-    // webPush.sendNotification(subscription, JSON.stringify(options));
-    // webPush.sendNotification(subscription);
+    const res = await fetch('http://localhost:3000/send-notification', {
+      method: 'post',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify({
+        token: subscription,
+        options: options,
+      }),
+    }).then(async (response) => await response.json());
+    // const res = await axios
+    //   .get('http://localhost:3000/send-notification', {
+    //     params: {
+    //       token: subscription,
+    //       options: options,
+    //     },
+    //   })
+    //   .then((response) => response.data)
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   })
+    //   .finally(function () {
+    //   });
+    isReturn.value = res;
+    console.log(res);
   }
 };
 /* end */

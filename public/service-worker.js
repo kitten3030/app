@@ -27,23 +27,24 @@ self.addEventListener('install', event => {
 // });
 
 // 前端監聽後端發送推播通知則觸發
-self.addEventListener('push', function (event) {
-  console.log('收到推播訊息', event);
-  // const payload = event.data.json();
+self.addEventListener('push', (event) => {
+  console.log('收到推播訊息222', event);
+  // const data = event.data?.json() ?? {};
+  // console.log('1111', data.message);
   // let options = {
-  //   body: payload.message,
-  //   icon: payload.icon,
-  //   badge: payload.icon,
+  //   body: data.message,
+  //   icon: data.icon,
+  //   badge: data.icon,
   //   // tag: '',
   //   // renotify: true,
   //   data: {
-  //     role: payload.role,
-  //     source: payload.source,
-  //     child_id: payload.child_id,
+  //     role: data.role,
+  //     source: data.source,
+  //     child_id: data.child_id,
   //   },
   // };
   // event.waitUntil(
-  //   self.registration.showNotification(payload.title, options)
+  //   self.registration.showNotification(data.title, options)
   // );
   let title = 'Hello';
   const options = {
