@@ -154,8 +154,8 @@ const urlB64ToUint8Array = (base64String) => {
   return outputArray;
 };
 // 接收發送的身份
-const PublicKey = 'BEjW9fGjflroMLSonoLkExR73VCagyqOBvrDC_wMQY33CTFeyg-hF21B6KYW8rv2tOR3lYGfEjizCFJHzBjtgzE';
-const PrivateKey = 'LrBMa7HyXfoqUIrXu6hVZ0r3lEO4l5QQjQTSZ9zU83M';
+const PublicKey = 'BEH_QqTiTkcPx8EPwt0PmZoap0zgdV4ezkMoD6uMX4KDpcbEdOo7pVSwSz2YJAZlo3F4x8yli6-b2VAFcvsrl7c';
+const PrivateKey = 'Ql8CW7p_-w8Bq8j99TG_hXb6hxfGDe0H4m-AJgkMb08';
 const ServerKey = urlB64ToUint8Array(PublicKey);
 // 註冊 sw.js
 const serviceWorker_register = async () => {
