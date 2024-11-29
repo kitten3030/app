@@ -72,6 +72,8 @@ web-push send-notification
 
 使用 firebase 資料庫
 npm install firebase --legacy-peer-deps
+
+https://console.firebase.google.com/u/0/project/notification-db317/firestore/databases/-default-/data/~2Fsubscriptions
 */
 
 // import webpush from 'web-push';
@@ -183,7 +185,6 @@ const serviceWorker_register = async () => {
         const data = JSON.parse(json);
         data.date = Date.now();
         // console.log(data);
-
         if (!subscriptions.value.some((item) => item.endpoint === res.endpoint)) {
           // 上傳至 firebase 資料庫
           await addDoc(collection(db, 'subscriptions'), data);
