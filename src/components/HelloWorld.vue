@@ -196,6 +196,7 @@ const serviceWorker_register = async () => {
           //   body: JSON.stringify(res),
           // });
         }
+        isNotification.value = true;
       })
       .catch((err) => {
         console.log('訂閱用戶失敗: ', err);
