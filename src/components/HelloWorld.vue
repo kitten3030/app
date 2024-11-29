@@ -50,9 +50,15 @@ import CurrentLoading from '@/components/util/CurrentLoading.vue';
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue';
 
 /*
+server
+終端機 D:\deen\webpack\app\server>
+npm install
+啟用執行 node app.js
+啟用執行 npx nodemon app
+
 發送端：安裝 web-push
 npm install web-push -g
-npm install web-push --legacy-peer-deps
+後端安裝發送 npm install web-push --save
 
 取得發送者身份，只要有身份就可以發送，不同電腦也可以共用
 web-push generate-vapid-keys
@@ -75,10 +81,6 @@ npm install firebase --legacy-peer-deps
 
 https://console.firebase.google.com/u/0/project/notification-db317/firestore/databases/-default-/data/~2Fsubscriptions
 */
-
-// import webpush from 'web-push';
-// const webpush = require('web-push');
-// const webpush = new URL('web-push', import.meta.url).href
 
 import {
   getFirestore,
@@ -156,8 +158,8 @@ const urlB64ToUint8Array = (base64String) => {
   return outputArray;
 };
 // 接收發送的身份
-const PublicKey = 'BEH_QqTiTkcPx8EPwt0PmZoap0zgdV4ezkMoD6uMX4KDpcbEdOo7pVSwSz2YJAZlo3F4x8yli6-b2VAFcvsrl7c';
-const PrivateKey = 'Ql8CW7p_-w8Bq8j99TG_hXb6hxfGDe0H4m-AJgkMb08';
+const PublicKey = 'BKVBgjPdr94hu8oAjr8SLBA5BOg9yYjZ3kLVDpMQlapWir-CitP_Wom8XrzNz4b5JGi22VaQtLZAoq2IkuRs-Rk';
+const PrivateKey = 'Xy9w670JgcwroARQ8u56PuLGYoi9Y0qACVryY5teOew';
 const ServerKey = urlB64ToUint8Array(PublicKey);
 // 註冊 sw.js
 const serviceWorker_register = async () => {
@@ -180,23 +182,22 @@ const serviceWorker_register = async () => {
         //   console.log('pushSubscription', pushSubscription);
         // });
       })
-      .then(async (res) => {
-        console.log('上傳使用者註冊身份', res);
-        const json = JSON.stringify(res);
+      .then(async (subscription) => {
+        console.log('上傳使用者註冊身份', subscription);
+        const json = JSON.stringify(subscription);
         const data = JSON.parse(json);
         data.date = Date.now();
         // console.log(data);
-        if (!subscriptions.value.some((item) => item.endpoint === res.endpoint)) {
+        if (!subscriptions.value.some((item) => item.endpoint === subscription.endpoint)) {
           // 上傳至 firebase 資料庫
           await addDoc(collection(db, 'subscriptions'), data);
-          // await fetch('https://days-pwas-practice.firebaseio.com/subscriptions.json', {
-          //   method: 'POST',
-          //   headers: {
-          //     'Content-TYpe': 'application/json',
-          //     Accept: 'application/json',
-          //   },
-          //   body: JSON.stringify(res),
-          // });
+          // 上傳至 server 資料庫
+          const res = await fetch('http://localhost:3000/save-subscription', {
+            method: 'post',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify(subscription),
+          }).then(async (response) => await response.json());
+          console.log(res);
         }
         isNotification.value = true;
       })
@@ -250,8 +251,41 @@ const initialiseState = async () => {
   return res;
 };
 
+/* 後端發送 */
+// const webpush = require('web-push');
 // const webPush = webpush;
 // webPush.setVapidDetails('mailto:deen1130@gmail.com', PublicKey, PrivateKey);
+const sendPushMessage = (token, payload, callback) => {
+  try {
+    // GCM 相容
+    webpush.setGCMAPIKey(VAPID_PUBLIC_KEY);
+    // 填入之前儲存的 endpoint, p256dh 與 auth
+    const pushSubscription = {
+      endpoint: token.endpoint,
+      keys: {
+        p256dh: token.keys.p256dh,
+        auth: token.keys.auth,
+      },
+    };
+    // 設定 VAPID public/private key 以及 email
+    webpush.setVapidDetails('mailto:name@youremail.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+    // 推播的內容
+    var json = payload;
+    // 傳送推播
+    webpush
+      .sendNotification(pushSubscription, json)
+      .then(function () {
+        callback(null);
+      })
+      .catch(function (err) {
+        callback(err);
+      });
+  } catch (e) {
+    callback(e);
+  }
+};
+/* end */
+
 const pushNotification = async () => {
   const options = {
     body: '感謝您發送此推播訊息',
@@ -369,6 +403,7 @@ body {
 .subscriptionBox {
   position: relative;
 }
+
 .flexBox-h {
   display: flex;
   align-items: center;
