@@ -73,6 +73,6 @@ app.post('/send-notification', (req, res) => {
 });
 
 // 服務端監聽
-app.listen(port, () => {
-  console.log('Server running on port 3000!');
+app.listen(port, '192.168.0.124', () => {
+  console.log('Server running on port 192.168.0.124:3000!');
 });

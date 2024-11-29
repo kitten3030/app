@@ -22,7 +22,7 @@
         <CurrentLoading :show="messageLoading" colorCode="#202b38" />
       </div>
       <div class="setupTitle">推播通知</div>
-      <div>11{{ isReturn }}</div>
+      <div>33{{ isReturn }}</div>
       <div class="subscriptionBox">
         <div class="flexBox-v gap-8">
           <div class="button">
@@ -196,7 +196,7 @@ const serviceWorker_register = async () => {
           // 上傳至 firebase 資料庫
           await addDoc(collection(db, 'subscriptions'), data);
           // 上傳至 server 資料庫
-          const res = await fetch('http://localhost:3000/save-subscription', {
+          const res = await fetch('http://192.168.0.124:3000/save-subscription', {
             method: 'post',
             headers: { 'Content-type': 'application/json' },
             body: JSON.stringify(subscription),
@@ -293,7 +293,7 @@ const pushNotification = async () => {
     const subscription = {
       ...subscriptions.value[0],
     };
-    const res = await fetch('http://localhost:3000/send-notification', {
+    const res = await fetch('http://192.168.0.124:3000/send-notification', {
       method: 'post',
       headers: { 'Content-type': 'application/json' },
       body: JSON.stringify({
@@ -302,7 +302,7 @@ const pushNotification = async () => {
       }),
     }).then(async (response) => await response.json());
     // const res = await axios
-    //   .get('http://localhost:3000/send-notification', {
+    //   .get('http://192.168.0.124:3000/send-notification', {
     //     params: {
     //       token: subscription,
     //       options: options,
