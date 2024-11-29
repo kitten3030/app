@@ -43,8 +43,6 @@
   </div>
 </template>
 
-<!-- JS 逐頁轉 pdf 檔為圖片格式 https://segmentfault.com/a/1190000043963349 -->
-
 <script setup>
 import CurrentLoading from '@/components/util/CurrentLoading.vue';
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue';
