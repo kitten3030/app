@@ -165,6 +165,7 @@ const serviceWorker_register = async () => {
     navigator.serviceWorker
       .register('./service-worker.js')
       .then((reg) => {
+        // const res = await initialiseState()
         // reg.unregister().then((boolean) => {
         //   // 如果 boolean = true，取消注册成功
         // });
@@ -213,6 +214,42 @@ const requestPermission = () => {
   });
 };
 
+const initialiseState = async () => {
+  // 檢查是否支援顯示通知
+  if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+    console.log("Notifications aren't supported.");
+    return;
+  }
+  // 檢查是否已被使用者拒絕顯示通知
+  if (Notification.permission === 'denied') {
+    console.log('The user has blocked notifications.');
+    return;
+  }
+  // 檢查是否支援推播
+  if (!('PushManager' in window)) {
+    console.log("Push messaging isn't supported.");
+    return;
+  }
+  // 確認我們的 service worker 是否已經註冊
+  const res = await navigator.serviceWorker.ready.then(async (reg) => {
+    // 檢查是否已經訂閱推播
+    const res = await reg.pushManager
+      .getSubscription()
+      .then(async (subscription) => {
+        if (subscription) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch(function (err) {
+        console.log('Error during getSubscription()', err);
+      });
+    return res;
+  });
+  return res;
+};
+
 // const webPush = webpush;
 // webPush.setVapidDetails('mailto:deen1130@gmail.com', PublicKey, PrivateKey);
 const pushNotification = async () => {
@@ -239,6 +276,10 @@ const pushNotification = async () => {
     //     // 對你的通知執行某些操作
     //   });
     // });
+    const subscription = {
+      ...subscriptions.value[0],
+    };
+    console.log(subscription);
     navigator.serviceWorker.getRegistration().then((reg) => {
       reg.showNotification('Hello', options);
     });
@@ -281,7 +322,7 @@ onMounted(async () => {
     });
     messageLoading.value = false;
   });
-  onUnmounted(liveMessages);
+  // onUnmounted(liveMessages);
   /* end */
 
   /* 推播通知 */
@@ -303,7 +344,7 @@ onMounted(async () => {
     });
     subscriptionLoading.value = false;
   });
-  onUnmounted(liveSubscription);
+  // onUnmounted(liveSubscription);
   /* end */
 });
 onUnmounted(async () => {});
